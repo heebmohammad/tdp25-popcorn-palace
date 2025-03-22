@@ -15,7 +15,7 @@ public record Movie(
     Genre genre,
     Integer duration,
     Float rating,
-    Year releaseYear
+    Year release_year
 ) {
 
     // No-argument constructor for JPA
@@ -24,8 +24,8 @@ public record Movie(
     }
 
     // Constructor for manual creation
-    public Movie(String title, Genre genre, Integer duration, Float rating, Year releaseYear) {
-        this(null, title, genre, duration, rating, releaseYear); // ID will be auto-generated
+    public Movie(String title, Genre genre, Integer duration, Float rating, Year release_year) {
+        this(null, title, genre, duration, rating, release_year); // ID will be auto-generated
         if (title == null || title.isEmpty()) {
             throw new IllegalArgumentException("Movie title cannot be empty.");
         }
@@ -39,7 +39,7 @@ public record Movie(
             throw new IllegalArgumentException("Movie rating must be between 0 and 10.");
         }
         // First movie was made in 1888
-        if (releaseYear == null || releaseYear.isBefore(Year.of(1888))) {
+        if (release_year == null || release_year.isBefore(Year.of(1888))) {
             throw new IllegalArgumentException("Movie release year is invalid.");
         }
     }

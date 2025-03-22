@@ -15,6 +15,6 @@ public interface MovieRepository extends CrudRepository<Movie, Long> {
     // update a movie by its title
     @Modifying
     @Transactional
-    @Query("UPDATE Movie m SET m.title = :newTitle, m.genre = :newGenre, m.duration = :newDuration, m.rating = :newRating, m.releaseYear = :newReleaseYear WHERE m.title = :oldTitle")
-    void updateMovieByTitle(String oldTitle, String newTitle, Genre newGenre, Integer newDuration, Float newRating, Year newReleaseYear);
+    @Query("UPDATE Movie m SET m.title = :newTitle, m.genre = :newGenre, m.duration = :newDuration, m.rating = :newRating, m.release_year = :new_release_year WHERE m.title = :oldTitle")
+    void updateMovieByTitle(String oldTitle, String newTitle, Genre newGenre, Integer newDuration, Float newRating, Year new_release_year);
 }
