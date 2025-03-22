@@ -2,12 +2,12 @@ package com.att.tdp.popcorn_palace.movie;
 
 import java.time.Year;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface MovieRepository extends CrudRepository<Movie, Long> {
+public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     // delete a movie by its title
     void deleteByTitle(String title);
