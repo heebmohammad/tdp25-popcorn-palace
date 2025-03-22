@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,16 +21,14 @@ public class MovieController {
     }
 
     @GetMapping("/all")
-    public List<Movie> findAll(Pageable pageable) {
+    public ResponseEntity<?> findAll(Pageable pageable) {
         try {
-            // Attempt to fetch the paginated results
             Page<Movie> moviePage = movieRepository.findAll(pageable);
-            return moviePage.getContent();  // Return the content (list of movies)
+            return ResponseEntity.ok(moviePage.getContent());
         } catch (Exception e) {
-            // Optionally, you could print it to the console if needed
-            System.err.println("\n\n\n\nError fetching movies: " + e.getMessage());
-            e.printStackTrace();
-            return List.of();  // Return an empty list in case of an error
+            // 500 Internal Server Error response
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body("Something went wrong. Please try again later.");
         }
     }
     

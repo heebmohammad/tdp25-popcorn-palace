@@ -1,6 +1,7 @@
 package com.att.tdp.popcorn_palace.movie;
 
 import java.time.Year;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -13,16 +14,24 @@ public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
+    @Column(name = "title")
     private String title;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "genre")
     private Genre genre;
 
+    @Column(name = "duration")
     private Integer duration;
+
+    @Column(name = "rating")
     private Float rating;
-    private Year release_year;
+
+    @Column(name = "release_year")
+    private Year releaseYear;
 
     // No-argument constructor for JPA
     public Movie() {
@@ -30,12 +39,12 @@ public class Movie {
     }
 
     // Constructor for manual creation
-    public Movie(String title, Genre genre, Integer duration, Float rating, Year release_year) {
+    public Movie(String title, Genre genre, Integer duration, Float rating, Year releaseYear) {
         this.title = title;
         this.genre = genre;
         this.duration = duration;
         this.rating = rating;
-        this.release_year = release_year;
+        this.releaseYear = releaseYear;
         
         if (title == null || title.isEmpty()) {
             throw new IllegalArgumentException("Movie title cannot be empty.");
@@ -50,7 +59,7 @@ public class Movie {
             throw new IllegalArgumentException("Movie rating must be between 0 and 10.");
         }
         // First movie was made in 1888
-        if (release_year == null || release_year.isBefore(Year.of(1888))) {
+        if (releaseYear == null || releaseYear.isBefore(Year.of(1888))) {
             throw new IllegalArgumentException("Movie release year is invalid.");
         }
     }
@@ -109,15 +118,15 @@ public class Movie {
         this.rating = rating;
     }
 
-    public Year getrelease_year() {
-        return release_year;
+    public Year getreleaseYear() {
+        return releaseYear;
     }
 
-    public void setrelease_year(Year release_year) {
+    public void setreleaseYear(Year releaseYear) {
         // First movie was made in 1888
-        if (release_year == null || release_year.isBefore(Year.of(1888))) {
+        if (releaseYear == null || releaseYear.isBefore(Year.of(1888))) {
             throw new IllegalArgumentException("Movie release year is invalid.");
         }
-        this.release_year = release_year;
+        this.releaseYear = releaseYear;
     }
 }
