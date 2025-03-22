@@ -1,7 +1,5 @@
 package com.att.tdp.popcorn_palace.movie;
 
-import java.time.Year;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,5 +14,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Modifying
     @Transactional
     @Query("UPDATE Movie m SET m.title = :newTitle, m.genre = :newGenre, m.duration = :newDuration, m.rating = :newRating, m.releaseYear = :new_releaseYear WHERE m.title = :oldTitle")
-    void updateMovieByTitle(String oldTitle, String newTitle, Genre newGenre, Integer newDuration, Float newRating, Year new_releaseYear);
+    void updateMovieByTitle(String oldTitle, String newTitle, Genre newGenre, Integer newDuration, Float newRating, Integer new_releaseYear);
 }

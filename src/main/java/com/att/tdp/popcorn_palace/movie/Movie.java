@@ -1,6 +1,5 @@
 package com.att.tdp.popcorn_palace.movie;
 
-import java.time.Year;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,7 +30,7 @@ public class Movie {
     private Float rating;
 
     @Column(name = "release_year")
-    private Year releaseYear;
+    private Integer releaseYear;
 
     // No-argument constructor for JPA
     public Movie() {
@@ -39,14 +38,14 @@ public class Movie {
     }
 
     // Constructor for manual creation
-    public Movie(String title, Genre genre, Integer duration, Float rating, Year releaseYear) {
-        this.title = title;
-        this.genre = genre;
+    public Movie(String title, String genre, Integer duration, Float rating, Integer releaseYear) {
+        this.title = title.trim();
+        this.genre = Genre.fromString(genre);
         this.duration = duration;
         this.rating = rating;
         this.releaseYear = releaseYear;
         
-        if (title == null || title.isEmpty()) {
+        if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Movie title cannot be empty.");
         }
         if (genre == null) {
@@ -59,7 +58,7 @@ public class Movie {
             throw new IllegalArgumentException("Movie rating must be between 0 and 10.");
         }
         // First movie was made in 1888
-        if (releaseYear == null || releaseYear.isBefore(Year.of(1888))) {
+        if (releaseYear == null || releaseYear < 1888 || releaseYear > 9999) {
             throw new IllegalArgumentException("Movie release year is invalid.");
         }
     }
@@ -79,7 +78,7 @@ public class Movie {
     }
 
     public void setTitle(String title) {
-        if (title == null || title.isEmpty()) {
+        if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Movie title cannot be empty.");
         }
         this.title = title;
@@ -89,11 +88,11 @@ public class Movie {
         return genre;
     }
 
-    public void setGenre(Genre genre) {
+    public void setGenre(String genre) {
         if (genre == null) {
             throw new IllegalArgumentException("Movie genre cannot be empty.");
         }
-        this.genre = genre;
+        this.genre = Genre.fromString(genre);
     }
 
     public Integer getDuration() {
@@ -118,13 +117,13 @@ public class Movie {
         this.rating = rating;
     }
 
-    public Year getreleaseYear() {
+    public Integer getreleaseYear() {
         return releaseYear;
     }
 
-    public void setreleaseYear(Year releaseYear) {
+    public void setreleaseYear(Integer releaseYear) {
         // First movie was made in 1888
-        if (releaseYear == null || releaseYear.isBefore(Year.of(1888))) {
+        if (releaseYear == null || releaseYear < 1888 || releaseYear > 9999) {
             throw new IllegalArgumentException("Movie release year is invalid.");
         }
         this.releaseYear = releaseYear;
