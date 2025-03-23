@@ -34,6 +34,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGenericException(Exception ex) {
         System.err.println(ex.getClass());
+        System.err.println(ex.getMessage());
         // Return a 500 Internal Server Error response with a default message
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Something went wrong. Please try again later.");

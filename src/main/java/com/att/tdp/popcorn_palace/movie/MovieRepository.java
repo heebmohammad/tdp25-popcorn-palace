@@ -12,6 +12,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     Optional<Movie> findByTitle(String title);
 
     // delete a movie by its title
+    @Transactional
     void deleteByTitle(String title);
 
     // update a movie by its title
