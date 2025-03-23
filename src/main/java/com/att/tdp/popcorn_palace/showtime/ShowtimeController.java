@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -110,6 +111,19 @@ public class ShowtimeController {
             showtime.getEndTime()
         );
 
+        // Return a 200 Ok response
+        return ResponseEntity.ok(null);
+    }
+
+    @DeleteMapping("/{showtimeId}")
+    public ResponseEntity<?> delete(@PathVariable Long showtimeId) {
+        // Check if the showtime with the given showtimeId exists
+        ResponseEntity<?> notFoundResponse = checkIfShowtimeNotFound(showtimeId);
+        if (notFoundResponse != null) {
+            return notFoundResponse;
+        }
+
+        showtimeRepository.deleteById(showtimeId);;
         // Return a 200 Ok response
         return ResponseEntity.ok(null);
     }
