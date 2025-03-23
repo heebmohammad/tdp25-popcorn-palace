@@ -15,6 +15,9 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Transactional
     void deleteByTitle(String title);
 
+    // check if movie exists by its title
+    boolean existsByTitle(String title);
+
     // update a movie by its title
     @Modifying
     @Transactional

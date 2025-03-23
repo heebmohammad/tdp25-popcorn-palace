@@ -1,7 +1,5 @@
 package com.att.tdp.popcorn_palace.movie;
 
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -26,8 +24,7 @@ public class MovieController {
 
     // Helper method to check if a movie exists by title
     private ResponseEntity<?> checkIfMovieExists(String title) {
-        Optional<Movie> movie = movieRepository.findByTitle(title);
-        if (movie.isPresent()) {
+        if (movieRepository.existsByTitle(title)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("A movie with the title '" + title + "' already exists.");
         }
@@ -36,8 +33,7 @@ public class MovieController {
 
     // Helper method to check if a movie is not found by title
     private ResponseEntity<?> checkIfMovieNotFound(String title) {
-        Optional<Movie> movie = movieRepository.findByTitle(title);
-        if (movie.isEmpty()) {
+        if (!movieRepository.existsByTitle(title)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body("Movie with title '" + title + "' not found.");
         }
