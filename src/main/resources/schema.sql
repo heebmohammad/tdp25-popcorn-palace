@@ -18,3 +18,11 @@ CREATE TABLE IF NOT EXISTS Showtime (
     CHECK (start_time < end_time),  -- Ensure start_time is before end_time
     FOREIGN KEY (movie_id) REFERENCES Movie(id) ON DELETE CASCADE  -- foreign key constraint
 );
+
+CREATE TABLE IF NOT EXISTS Booking (
+    booking_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    showtime_id BIGINT NOT NULL,
+    seat_number INT NOT NULL CHECK (seat_number > 0),
+    user_id UUID NOT NULL,
+    FOREIGN KEY (showtime_id) REFERENCES Showtime(id) ON DELETE CASCADE
+);
