@@ -2,6 +2,8 @@ package com.att.tdp.popcorn_palace.booking;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,12 +19,15 @@ public class Booking {
     @Column(name = "booking_id")
     private UUID bookingId;
 
+    @JsonIgnore
     @Column(name = "showtime_id")
     private Long showtimeId;
 
+    @JsonIgnore
     @Column(name = "seat_number")
     private Integer seatNumber;
 
+    @JsonIgnore
     @Column(name = "user_id")
     private UUID userId;
 
