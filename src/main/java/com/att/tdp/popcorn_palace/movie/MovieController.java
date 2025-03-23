@@ -74,7 +74,7 @@ public class MovieController {
             return existsResponse;
         }
 
-         // update the movie
+        // update the movie
         movieRepository.updateMovieByTitle(
             movieTitle,
             newMovie.getTitle(),

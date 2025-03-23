@@ -81,5 +81,37 @@ public class ShowtimeController {
         // Return a 200 Ok response with the saved movie
         return ResponseEntity.ok(savedShowtime);
     }
+
+    @PostMapping("/update/{showtimeId}")
+    public ResponseEntity<?> update(@RequestBody Showtime showtime, @PathVariable Long showtimeId) {
+        // Check if the showtime with the given showtimeId exists
+        ResponseEntity<?> notFoundResponse = checkIfShowtimeNotFound(showtimeId);
+        if (notFoundResponse != null) {
+            return notFoundResponse;
+        }
+
+        ResponseEntity<?> movieExistResponse = checkIfMovieExist(showtime.getMovieId());
+        if (movieExistResponse != null) {
+            return movieExistResponse;
+        }
+
+        ResponseEntity<?> overlapResponse = checkIfShowtimeOverlap(showtime);
+        if (overlapResponse != null) {
+            return overlapResponse;
+        }
+
+        // update the showtime
+        showtimeRepository.updateShowtime(
+            showtimeId,
+            showtime.getMovieId(),
+            showtime.getPrice(),
+            showtime.getTheater(),
+            showtime.getStartTime(),
+            showtime.getEndTime()
+        );
+
+        // Return a 200 Ok response
+        return ResponseEntity.ok(null);
+    }
     
 }
