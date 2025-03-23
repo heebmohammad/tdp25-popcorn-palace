@@ -53,7 +53,7 @@ public class MovieController {
         if (oldMovie.isEmpty()) {
             // Return a 404 Not Found if the movie doesn't exist
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body("Movie with title '" + movieTitle+ "' not found.");
+            .body("Movie with title '" + movieTitle + "' not found.");
         }
 
         // Check if a movie with the same title already exists
@@ -79,8 +79,18 @@ public class MovieController {
     }
 
     @DeleteMapping("/{movieTitle}")
-    void delete(@PathVariable String movieTitle) {
+    public ResponseEntity<?> delete(@PathVariable String movieTitle) {
+        // Check if the movie with the given title exists
+        Optional<Movie> oldMovie = movieRepository.findByTitle(movieTitle);
+        if (oldMovie.isEmpty()) {
+            // Return a 404 Not Found if the movie doesn't exist
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body("Movie with title '" + movieTitle + "' not found.");
+        }
+
         movieRepository.deleteByTitle(movieTitle);
+        // Return a 200 Ok response
+        return ResponseEntity.ok(null);
     }
     
 }
