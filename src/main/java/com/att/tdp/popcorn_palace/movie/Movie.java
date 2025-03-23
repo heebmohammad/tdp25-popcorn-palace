@@ -37,32 +37,6 @@ public class Movie {
         // Default constructor
     }
 
-    // Constructor for manual creation
-    public Movie(String title, String genre, Integer duration, Float rating, Integer releaseYear) {
-        this.title = title.trim();
-        this.genre = Genre.fromString(genre);
-        this.duration = duration;
-        this.rating = rating;
-        this.releaseYear = releaseYear;
-        
-        if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Movie title cannot be empty.");
-        }
-        if (genre == null) {
-            throw new IllegalArgumentException("Movie genre cannot be empty.");
-        }
-        if (duration == null || duration <= 0) {
-            throw new IllegalArgumentException("Movie duration must be a positive number.");
-        }
-        if (rating == null || rating < 0 || rating > 10) {
-            throw new IllegalArgumentException("Movie rating must be between 0 and 10.");
-        }
-        // First movie was made in 1888
-        if (releaseYear == null || releaseYear < 1888 || releaseYear > 9999) {
-            throw new IllegalArgumentException("Movie release year is invalid.");
-        }
-    }
-
     // Getters and Setters
 
     public Long getId() {
