@@ -6,6 +6,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
@@ -28,6 +29,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNoResourceFoundException(NoResourceFoundException ex) {
         String errorMessage = "Unsupported: " + ex.getMessage();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<String> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        String errorMessage = String.format("Argument error. Parameter '%s' must be of type '%s'.",
+            ex.getName(), ex.getRequiredType().getSimpleName());
+        return ResponseEntity.badRequest().body(errorMessage);
     }
 
     // Generic fallback for all other unhandled exceptions
