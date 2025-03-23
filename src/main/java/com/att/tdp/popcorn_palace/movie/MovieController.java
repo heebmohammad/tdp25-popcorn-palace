@@ -24,6 +24,26 @@ public class MovieController {
         this.movieRepository = movieRepository;
     }
 
+    // Helper method to check if a movie exists by title
+    private ResponseEntity<?> checkIfMovieExists(String title) {
+        Optional<Movie> movie = movieRepository.findByTitle(title);
+        if (movie.isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("A movie with the title '" + title + "' already exists.");
+        }
+        return null; // No error found
+    }
+
+    // Helper method to check if a movie is not found by title
+    private ResponseEntity<?> checkIfMovieNotFound(String title) {
+        Optional<Movie> movie = movieRepository.findByTitle(title);
+        if (movie.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Movie with title '" + title + "' not found.");
+        }
+        return null; // No error found
+    }
+
     @GetMapping("/all")
     public ResponseEntity<?> findAll(Pageable pageable) {
         Page<Movie> moviePage = movieRepository.findAll(pageable);
@@ -33,11 +53,9 @@ public class MovieController {
     @PostMapping("")
     public ResponseEntity<?> create(@RequestBody Movie movie) {
         // Check if a movie with the same title already exists
-        Optional<Movie> existingMovie = movieRepository.findByTitle(movie.getTitle());
-        if (existingMovie.isPresent()) {
-            // Return a 400 Bad Request status with an error message
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body("A movie with the title '" + movie.getTitle() + "' already exists.");
+        ResponseEntity<?> existsResponse = checkIfMovieExists(movie.getTitle());
+        if (existsResponse != null) {
+            return existsResponse;
         }
 
         Movie savedMovie = movieRepository.save(movie);
@@ -49,19 +67,15 @@ public class MovieController {
     @PostMapping("/update/{movieTitle}")
     public ResponseEntity<?> update(@RequestBody Movie newMovie, @PathVariable String movieTitle) {
         // Check if the movie with the given title exists
-        Optional<Movie> oldMovie = movieRepository.findByTitle(movieTitle);
-        if (oldMovie.isEmpty()) {
-            // Return a 404 Not Found if the movie doesn't exist
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body("Movie with title '" + movieTitle + "' not found.");
+        ResponseEntity<?> notFoundResponse = checkIfMovieNotFound(movieTitle);
+        if (notFoundResponse != null) {
+            return notFoundResponse;
         }
 
-        // Check if a movie with the same title already exists
-        Optional<Movie> existingMovie = movieRepository.findByTitle(newMovie.getTitle());
-        if (existingMovie.isPresent()) {
-            // Return a 400 Bad Request status with an error message
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body("A movie with the title '" + newMovie.getTitle() + "' already exists.");
+        // Check if a movie with the same new title already exists
+        ResponseEntity<?> existsResponse = checkIfMovieExists(newMovie.getTitle());
+        if (existsResponse != null) {
+            return existsResponse;
         }
 
          // update the movie
@@ -81,11 +95,9 @@ public class MovieController {
     @DeleteMapping("/{movieTitle}")
     public ResponseEntity<?> delete(@PathVariable String movieTitle) {
         // Check if the movie with the given title exists
-        Optional<Movie> oldMovie = movieRepository.findByTitle(movieTitle);
-        if (oldMovie.isEmpty()) {
-            // Return a 404 Not Found if the movie doesn't exist
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body("Movie with title '" + movieTitle + "' not found.");
+        ResponseEntity<?> notFoundResponse = checkIfMovieNotFound(movieTitle);
+        if (notFoundResponse != null) {
+            return notFoundResponse;
         }
 
         movieRepository.deleteByTitle(movieTitle);
