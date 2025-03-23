@@ -117,11 +117,11 @@ public class Movie {
         this.rating = rating;
     }
 
-    public Integer getreleaseYear() {
+    public Integer getReleaseYear() {
         return releaseYear;
     }
 
-    public void setreleaseYear(Integer releaseYear) {
+    public void setReleaseYear(Integer releaseYear) {
         // First movie was made in 1888
         if (releaseYear == null || releaseYear < 1888 || releaseYear > 9999) {
             throw new IllegalArgumentException("Movie release year is invalid.");
