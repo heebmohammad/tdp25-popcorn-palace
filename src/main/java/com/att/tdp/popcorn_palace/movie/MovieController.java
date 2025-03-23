@@ -25,7 +25,7 @@ public class MovieController {
     // Helper method to check if a movie exists by title
     private ResponseEntity<?> checkIfMovieExists(String title) {
         if (movieRepository.existsByTitle(title)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.badRequest()
                 .body("A movie with the title '" + title + "' already exists.");
         }
         return null; // No error found

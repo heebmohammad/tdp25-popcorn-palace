@@ -33,8 +33,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<String> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
-        String errorMessage = String.format("Argument error. Parameter '%s' must be of type '%s'.",
-            ex.getName(), ex.getRequiredType().getSimpleName());
+        String name = (ex.getRequiredType() != null) ? ex.getRequiredType().getSimpleName() : "Unknown";
+        String errorMessage = String.format("Argument error: Parameter '%s' must be of type '%s'.",
+            ex.getName(), name);
         return ResponseEntity.badRequest().body(errorMessage);
     }
 

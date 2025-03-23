@@ -16,14 +16,14 @@ public class Showtime {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "price")
+    private Float price;
+
     @Column(name = "movie_id")
     private Long movieId;
 
     @Column(name = "theater")
     private String theater;
-
-    @Column(name = "price")
-    private Float price;
 
     @Column(name = "start_time")
     private Date startTime;
