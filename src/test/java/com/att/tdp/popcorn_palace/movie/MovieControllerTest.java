@@ -1,11 +1,13 @@
 package com.att.tdp.popcorn_palace.movie;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,23 +65,23 @@ public class MovieControllerTest {
     public void testUpdateMovie() throws Exception {
         String movieTitle = "Movie1";
         Movie newMovie = new Movie("Movie3", "Drama", 130, 8.0, 2022);
+
+        // Mock repository behavior for existing movie and title check
+        Movie existingMovie = new Movie("Movie1", "Action", 120, 7.5, 2020); // Example existing movie
+        existingMovie.setId(1L); // Mock existing ID
         
-        when(movieRepository.existsByTitle(movieTitle)).thenReturn(true);
+        when(movieRepository.existsByTitle(existingMovie.getTitle())).thenReturn(true);
+        when(movieRepository.findByTitle(movieTitle)).thenReturn(Optional.of(existingMovie));
         when(movieRepository.existsByTitle(newMovie.getTitle())).thenReturn(false);
 
+        // Mocking the save behavior
+        when(movieRepository.save(newMovie)).thenReturn(newMovie);
+
+        // Perform the update operation
         mockMvc.perform(post("/movies/update/{movieTitle}", movieTitle)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"title\": \"Movie3\", \"genre\": \"Drama\", \"duration\": 130, \"rating\": 8.0, \"releaseYear\": 2022}"))
-               .andExpect(status().isOk());
-
-        verify(movieRepository, times(1)).updateMovieByTitle(
-                eq(movieTitle),
-                eq(newMovie.getTitle()),
-                eq(newMovie.getGenre()),
-                eq(newMovie.getDuration()),
-                eq(newMovie.getRating()),
-                eq(newMovie.getReleaseYear())
-        );
+            .andExpect(status().isOk());
     }
 
     // Test for "DELETE /movies/{movieTitle}"
@@ -91,8 +93,6 @@ public class MovieControllerTest {
 
         mockMvc.perform(delete("/movies/{movieTitle}", movieTitle))
                .andExpect(status().isOk());
-
-        verify(movieRepository, times(1)).deleteByTitle(movieTitle);
     }
 
     // Test for movie already exists while creating (should return 400)

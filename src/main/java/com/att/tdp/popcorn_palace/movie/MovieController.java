@@ -67,6 +67,8 @@ public class MovieController {
         if (notFoundResponse != null) {
             return notFoundResponse;
         }
+        Long id = movieRepository.findByTitle(movieTitle).get().getId();
+        newMovie.setId(id);
 
         if (!newMovie.getTitle().equals(movieTitle)) {
             // Check if a movie with the same new title already exists
@@ -77,14 +79,7 @@ public class MovieController {
         }
 
         // update the movie
-        movieRepository.updateMovieByTitle(
-            movieTitle,
-            newMovie.getTitle(),
-            newMovie.getGenre(),
-            newMovie.getDuration(),
-            newMovie.getRating(),
-            newMovie.getReleaseYear()
-        );
+        movieRepository.save(newMovie);
 
         // Return a 200 Ok response
         return ResponseEntity.ok(null);
