@@ -39,6 +39,7 @@ public class BookingController {
 
     @PostMapping("")
     public ResponseEntity<?> create(@RequestBody Booking booking) {
+        booking.validateFields();
         ResponseEntity<?> showtimeExistResponse = checkIfShowtimeExist(booking.getShowtimeId());
         if (showtimeExistResponse != null) {
             return showtimeExistResponse;

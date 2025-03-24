@@ -67,6 +67,7 @@ public class ShowtimeController {
 
     @PostMapping("")
     public ResponseEntity<?> create(@RequestBody Showtime showtime) {
+        showtime.validateFields();
         ResponseEntity<?> movieExistResponse = checkIfMovieExist(showtime.getMovieId());
         if (movieExistResponse != null) {
             return movieExistResponse;
@@ -85,6 +86,7 @@ public class ShowtimeController {
 
     @PostMapping("/update/{showtimeId}")
     public ResponseEntity<?> update(@RequestBody Showtime showtime, @PathVariable Long showtimeId) {
+        showtime.validateFields();
         // Check if the showtime with the given showtimeId exists
         ResponseEntity<?> notFoundResponse = checkIfShowtimeNotFound(showtimeId);
         if (notFoundResponse != null) {

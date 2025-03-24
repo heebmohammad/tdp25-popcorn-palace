@@ -41,6 +41,18 @@ public class Booking {
         setUserId(userId);
     }
 
+    public void validateFields() {
+        if (showtimeId == null) {
+            throw new IllegalStateException("'showtimeId' is missing.");
+        }
+        if (seatNumber == null) {
+            throw new IllegalStateException("'seatNumber' is missing.");
+        }
+        if (userId == null) {
+            throw new IllegalStateException("'userId' is missing.");
+        }
+    }
+
     // Getters and Setters
     
     public UUID getBookingId() {

@@ -48,6 +48,24 @@ public class Movie {
         setReleaseYear(releaseYear);
     }
 
+    public void validateFields() {
+        if (title == null) {
+            throw new IllegalStateException("'title' is missing.");
+        }
+        if (genre == null) {
+            throw new IllegalStateException("'genre' is missing.");
+        }
+        if (duration == null) {
+            throw new IllegalStateException("'duration' is missing.");
+        }
+        if (rating == null) {
+            throw new IllegalStateException("'rating' is missing.");
+        }
+        if (releaseYear == null) {
+            throw new IllegalStateException("'releaseYear' is missing.");
+        }
+    }
+
     // Getters and Setters
 
     public Long getId() {

@@ -47,6 +47,24 @@ public class Showtime {
         setEndTime(endTime);
     }
 
+    public void validateFields() {
+        if (price == null) {
+            throw new IllegalStateException("'price' is missing.");
+        }
+        if (movieId == null) {
+            throw new IllegalStateException("'movieId' is missing.");
+        }
+        if (theater == null) {
+            throw new IllegalStateException("'theater' is missing.");
+        }
+        if (startTime == null) {
+            throw new IllegalStateException("'startTime' is missing.");
+        }
+        if (endTime == null) {
+            throw new IllegalStateException("'endTime' is missing.");
+        }
+    }
+
     // Getters and Setters
 
     public Long getId() {

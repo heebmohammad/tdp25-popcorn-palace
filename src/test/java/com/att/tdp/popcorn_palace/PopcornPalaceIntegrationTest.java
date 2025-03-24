@@ -148,7 +148,7 @@ public class PopcornPalaceIntegrationTest {
 
     @Test
     public void testGetAllMoviesDetails() {
-        String jsonResponse = restClient.get().uri("/movies/all").retrieve().body(String.class);
+        String jsonResponse = restClient.get().uri("/movies/all?size=1&sort=title,desc").retrieve().body(String.class);
         assertNotNull(jsonResponse);
         try {
             ObjectMapper objectMapper = new ObjectMapper();

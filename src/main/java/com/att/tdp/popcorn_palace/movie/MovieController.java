@@ -48,6 +48,7 @@ public class MovieController {
 
     @PostMapping("")
     public ResponseEntity<?> create(@RequestBody Movie movie) {
+        movie.validateFields();
         // Check if a movie with the same title already exists
         ResponseEntity<?> existsResponse = checkIfMovieExists(movie.getTitle());
         if (existsResponse != null) {
@@ -70,6 +71,7 @@ public class MovieController {
         Long id = movieRepository.findByTitle(movieTitle).get().getId();
         newMovie.setId(id);
 
+        newMovie.validateFields();
         if (!newMovie.getTitle().equals(movieTitle)) {
             // Check if a movie with the same new title already exists
             ResponseEntity<?> existsResponse = checkIfMovieExists(newMovie.getTitle());

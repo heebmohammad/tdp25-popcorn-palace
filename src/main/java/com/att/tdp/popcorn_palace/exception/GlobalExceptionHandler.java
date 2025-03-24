@@ -13,9 +13,13 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        // Customize the response body with the error message
         String errorMessage = (ex.getCause().getCause() != null) ? ex.getCause().getCause().getMessage() : "Invalid Request Body.";
-        // todo: return json response
+        return ResponseEntity.badRequest().body(errorMessage);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
+        String errorMessage = ex.getMessage();
         return ResponseEntity.badRequest().body(errorMessage);
     }
 
