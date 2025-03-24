@@ -1,5 +1,6 @@
 package com.att.tdp.popcorn_palace.booking;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -48,7 +49,7 @@ public class BookingControllerTest {
         // Perform POST request
         mockMvc.perform(post("/bookings")
                 .contentType("application/json")
-                .content("{\"showtimeId\": " + showtimeId + ", \"seatNumber\": \"" + seatNumber + "\"}"))
+                .content("{\"showtimeId\": " + showtimeId + ", \"seatNumber\": \"" + seatNumber + "\", \"userId\": \"" + USER_ID.toString() + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.bookingId").value(id.toString()));
     }
@@ -66,7 +67,7 @@ public class BookingControllerTest {
         // Perform POST request
         mockMvc.perform(post("/bookings")
                 .contentType("application/json")
-                .content("{\"showtimeId\": " + showtimeId + ", \"seatNumber\": \"" + seatNumber + "\"}"))
+                .content("{\"showtimeId\": " + showtimeId + ", \"seatNumber\": \"" + seatNumber + "\", \"userId\": \"" + USER_ID.toString() + "\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Seat Already Booked."));
     }
@@ -83,7 +84,7 @@ public class BookingControllerTest {
         // Perform POST request
         mockMvc.perform(post("/bookings")
                 .contentType("application/json")
-                .content("{\"showtimeId\": " + showtimeId + ", \"seatNumber\": \"" + seatNumber + "\"}"))
+                .content("{\"showtimeId\": " + showtimeId + ", \"seatNumber\": \"" + seatNumber + "\", \"userId\": \"" + USER_ID.toString() + "\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Showtime with id '1' does not exist."));
     }

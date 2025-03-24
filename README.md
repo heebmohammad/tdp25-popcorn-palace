@@ -32,7 +32,7 @@ Content from [Instructions.md](Instructions.md).
 | Update a movie    | POST /movies/update/{movieTitle} | `{ "title": "New Title", "genre": "Action", "duration": 120, "rating": 8.7, "releaseYear": 2025 }` | 200 OK          |                                                                                                                                                |
 | Delete a movie    | DELETE /movies/{movieTitle} |                                                                              | 200 OK          |                                                                                                                                                |
 
-**Valid Genres**: Action, Drama, Comedy, Thriller, Horror, Science Fiction, Romance, Documentary, Animation, Fantasy.
+> **Valid Genres**: Action, Drama, Comedy, Thriller, Horror, Science Fiction, Romance, Documentary, Animation, Fantasy.
 
 ---
 
@@ -45,7 +45,7 @@ Content from [Instructions.md](Instructions.md).
 | Update a showtime | POST /showtimes/update/{showtimeId} | `{ "movieId": 1, "price": 50.2, "theater": "Sample Theater", "startTime": "...", "endTime": "..." }`     | 200 OK          |                                                                                                                                                |
 | Delete a showtime | DELETE /showtimes/{showtimeId}  |                                                                                                          | 200 OK          |                                                                                                                                                |
 
-**Date Format**: Ensure the date can be converted to `LocalDateTime`.
+> **Date Format**: Ensure the date can be converted to `LocalDateTime`.
 
 ---
 
@@ -55,4 +55,4 @@ Content from [Instructions.md](Instructions.md).
 |-------------------|---------------|-------------------------------------------------------------|-----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Book a ticket     | POST /bookings| `{ "showtimeId": 1, "seatNumber": 15, "userId": "UUID" }`   | 200 OK          | `{ "bookingId": "d1a6423b-4469-4b00-8c5f-e3cfc42eacae" }`                                                                                             |
 
-**Note**: `userId` must be a UUID.
+> **Note**: `userId` must be a UUID.

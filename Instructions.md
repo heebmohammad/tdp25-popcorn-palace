@@ -4,7 +4,7 @@
 
 Before you begin, ensure you have met the following requirements:
 
-- **Operating System**: [Windows, Linux]
+- **Operating System**: [Windows, Linux, macOS]
 - **Software Requirements**:
   - **Java SDK 21**: [Download Java SDK 21](https://www.oracle.com/java/technologies/downloads/#java21)
   - **Docker Desktop**: [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
@@ -19,7 +19,7 @@ Before you begin, ensure you have met the following requirements:
 
 2. **Clone the Repository**:
     ```bash
-    git clone git@github.com:xxxx.git
+    git clone git@github.com:heebmohammad/tdp25-popcorn-palace.git
     cd tdp25-popcorn-palace
     ```
 
@@ -66,7 +66,7 @@ To run the application locally:
     ./mvnw spring-boot:run
     ```
 
-Once the application is running, visit `http://localhost:8080` (or any port specified in your configuration) to access the app.
+Once the application is running, visit `http://localhost:8080` (or any port specified in the configuration) to access the app.
 
 ## Test
 
@@ -83,3 +83,5 @@ To run the tests for this project:
     ```
 
 This will run all the tests defined in the project.
+
+> **Note**: The Thunder Client extension in VS Code is a handy tool for testing APIs.

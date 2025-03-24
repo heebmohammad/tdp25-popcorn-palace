@@ -1,5 +1,6 @@
 package com.att.tdp.popcorn_palace.showtime;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -62,7 +63,7 @@ public class ShowtimeControllerTest {
 
         mockMvc.perform(post("/showtimes")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"movieId\": 1, \"theater\": \"Theater1\", \"startTime\": \"2025-03-24T10:00:00\", \"endTime\": \"2025-03-24T12:00:00\"}"))
+                .content("{\"movieId\": 1, \"theater\": \"Theater1\", \"startTime\": \"2025-03-24T10:00:00\", \"endTime\": \"2025-03-24T12:00:00\", \"price\": 20.0}"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.theater").value("Theater1"));
     }
@@ -74,7 +75,7 @@ public class ShowtimeControllerTest {
 
         mockMvc.perform(post("/showtimes")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"movieId\": 999, \"theater\": \"Theater1\", \"startTime\": \"2025-03-24T10:00:00\", \"endTime\": \"2025-03-24T12:00:00\"}"))
+                .content("{\"movieId\": 999, \"theater\": \"Theater1\", \"startTime\": \"2025-03-24T10:00:00\", \"endTime\": \"2025-03-24T12:00:00\", \"price\": 20.0}"))
                .andExpect(status().isBadRequest())
                .andExpect(content().string("Movie with id '999' does not exist."));
     }
@@ -89,7 +90,7 @@ public class ShowtimeControllerTest {
 
         mockMvc.perform(post("/showtimes")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"movieId\": 1, \"theater\": \"Theater1\", \"startTime\": \"2025-03-24T10:00:00\", \"endTime\": \"2025-03-24T12:00:00\"}"))
+                .content("{\"movieId\": 1, \"theater\": \"Theater1\", \"startTime\": \"2025-03-24T10:00:00\", \"endTime\": \"2025-03-24T12:00:00\", \"price\": 20.0}"))
                .andExpect(status().isBadRequest())
                .andExpect(content().string("Overlapping showtime."));
     }
@@ -106,7 +107,7 @@ public class ShowtimeControllerTest {
 
         mockMvc.perform(post("/showtimes/update/{showtimeId}", showtimeId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"movieId\": 1, \"theater\": \"Theater1\", \"startTime\": \"2025-03-24T10:00:00\", \"endTime\": \"2025-03-24T12:00:00\"}"))
+                .content("{\"movieId\": 1, \"theater\": \"Theater1\", \"startTime\": \"2025-03-24T10:00:00\", \"endTime\": \"2025-03-24T12:00:00\", \"price\": 20.0}"))
                .andExpect(status().isOk());
     }
 
@@ -118,7 +119,7 @@ public class ShowtimeControllerTest {
 
         mockMvc.perform(post("/showtimes/update/{showtimeId}", showtimeId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"movieId\": 1, \"theater\": \"Theater1\", \"startTime\": \"2025-03-24T10:00:00\", \"endTime\": \"2025-03-24T12:00:00\"}"))
+                .content("{\"movieId\": 1, \"theater\": \"Theater1\", \"startTime\": \"2025-03-24T10:00:00\", \"endTime\": \"2025-03-24T12:00:00\", \"price\": 20.0}"))
                .andExpect(status().isNotFound())
                .andExpect(content().string("Showtime with id '999' not found."));
     }
