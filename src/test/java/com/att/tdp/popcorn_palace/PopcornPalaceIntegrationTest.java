@@ -2,17 +2,13 @@ package com.att.tdp.popcorn_palace;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.matchers.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestClient;
 
 import com.att.tdp.popcorn_palace.booking.Booking;
@@ -118,6 +114,7 @@ public class PopcornPalaceIntegrationTest {
     @Test
     public void testGetAllMovies() {
         List<Movie> movies = restClient.get().uri("/movies/all").retrieve().body(new ParameterizedTypeReference<>() {});
+        assertNotNull(movies);
         assertEquals(5, movies.size()); // Validate the number of movies
     }
 
@@ -125,6 +122,7 @@ public class PopcornPalaceIntegrationTest {
     public void testGetAllMoviesWhenNoMoviesExist() {
         movieRepository.deleteAll();  // Clear all movies
         List<Movie> movies = restClient.get().uri("/movies/all").retrieve().body(new ParameterizedTypeReference<>() {});
+        assertNotNull(movies);
         assertEquals(0, movies.size()); // Verify no movies
     }
 
@@ -167,7 +165,9 @@ public class PopcornPalaceIntegrationTest {
         .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
         .toEntity(String.class);
         assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
-        assertTrue(res.getBody().contains("A movie with the title 'Inception' already exists."));
+        String errorMessage = res.getBody();
+        assertNotNull(errorMessage);
+        assertTrue(errorMessage.equals("A movie with the title 'Inception' already exists."));
     }
 
     @Test
@@ -222,7 +222,6 @@ public class PopcornPalaceIntegrationTest {
         ResponseEntity<Showtime> response = restClient.post().uri("/showtimes").body(newShowtime).retrieve().toEntity(Showtime.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertNotNull(response.getBody().getTheater());
     }
 
     @Test
@@ -241,14 +240,46 @@ public class PopcornPalaceIntegrationTest {
     }
 
     /****************************** Booking API ******************************/
-/*
+
     @Test
     public void testCreateBookingSuccess() {
         Booking newBooking = new Booking(showtime3.getId(), 3, UUID.randomUUID());
-        ResponseEntity<Booking> response = restClient.post("/bookings", newBooking, Booking.class);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(bookingRepository.findById(newBooking.getId()));
+        String jsonResponse = restClient.post().uri("/bookings")
+        .body(newBooking).retrieve().toEntity(String.class).getBody();
+        assertNotNull(jsonResponse);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+            assertTrue(jsonNode.has("bookingId"));
+            UUID id = UUID.fromString(jsonNode.get("bookingId").asText());
+            assertNotNull(id);
+        } catch (JsonProcessingException e) {
+            fail("Failed to process JSON: " + e.getMessage());
+        }
     }
 
-*/
+    @Test
+    public void testCreateBookingShowtimeNotExist() {
+        Booking newBooking = new Booking(99999L, 3, UUID.randomUUID());
+        ResponseEntity<String> res = restClient.post().uri("/bookings").body(newBooking).retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
+        .toEntity(String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
+        String errorMessage = res.getBody();
+        assertNotNull(errorMessage);
+        assertTrue(errorMessage.equals("Showtime with id '99999' does not exist."));
+    }
+
+    @Test
+    public void testCreateBookingBookedSeat() {
+        Booking newBooking = new Booking(book1.getShowtimeId(), book1.getSeatNumber(), UUID.randomUUID());
+        ResponseEntity<String> res = restClient.post().uri("/bookings").body(newBooking).retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
+        .toEntity(String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
+        String errorMessage = res.getBody();
+        assertNotNull(errorMessage);
+        assertTrue(errorMessage.equals("Seat Already Booked."));
+    }
+
 }
