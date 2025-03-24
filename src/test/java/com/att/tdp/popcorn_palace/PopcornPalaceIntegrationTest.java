@@ -235,28 +235,53 @@ public class PopcornPalaceIntegrationTest {
         assertFalse(movieRepository.existsById(matrix.getId()));
     }
 
+    @Test
+    public void testDeleteMovieNotExist() {
+        ResponseEntity<String> res = restClient.delete().uri("/movies/{movieTitle}", "NoMovie").retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
+        .toEntity(String.class);
+        assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+    }
+
     /****************************** Showtime API ******************************/
 
-    @Test
-    public void testGetShowtimeByIdSuccess() {
-        String jsonResponse = restClient.get().uri("/showtimes/{showtimeId}", showtime1.getId()).retrieve().body(String.class);
-        assertNotNull(jsonResponse);
+    private void assertShowtimeJson(Showtime expected, String jsonResponse) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonResponse);
             assertTrue(jsonNode.has("id"));
             Long id = jsonNode.get("id").asLong();
-            Showtime showtime = objectMapper.readValue(jsonNode.toString(), Showtime.class);
+            Showtime actual = objectMapper.readValue(jsonNode.toString(), Showtime.class);
             
-            assertEquals(showtime1.getId(), id);
-            assertEquals(showtime1.getPrice(), showtime.getPrice(), 0.1);
-            assertEquals(showtime1.getTheater(), showtime.getTheater());
-            assertEquals(showtime1.getStartTime(), showtime.getStartTime());
-            assertEquals(showtime1.getEndTime(), showtime.getEndTime());
+            if (expected.getId() != null) {
+                assertEquals(expected.getId(), id);
+            }
+            assertEquals(expected.getPrice(), actual.getPrice(), 0.1);
+            assertEquals(expected.getTheater(), actual.getTheater());
+            assertEquals(expected.getStartTime(), actual.getStartTime());
+            assertEquals(expected.getEndTime(), actual.getEndTime());
         } catch (JsonProcessingException e) {
             fail("Failed to process JSON: " + e.getMessage());
         }
+    }
+
+    @Test
+    public void testGetShowtimeByIdSuccess() {
+        String jsonResponse = restClient.get().uri("/showtimes/{showtimeId}", showtime1.getId()).retrieve().body(String.class);
+        assertNotNull(jsonResponse);
+        assertShowtimeJson(showtime1, jsonResponse);
+    }
+
+    @Test
+    public void testGetShowtimeByIdNotExist() {
+        ResponseEntity<String> res = restClient.get().uri("/showtimes/{showtimeId}", 99999L).retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
+        .toEntity(String.class);
+        assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+        String errorMessage = res.getBody();
+        assertNotNull(errorMessage);
+        assertEquals("Showtime with id '99999' not found.", errorMessage);
     }
 
     @Test
@@ -268,9 +293,29 @@ public class PopcornPalaceIntegrationTest {
             LocalDateTime.parse("2025-03-10T15:30"),
             LocalDateTime.parse("2025-03-10T18:30")
         );
-        ResponseEntity<Showtime> response = restClient.post().uri("/showtimes").body(newShowtime).retrieve().toEntity(Showtime.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
+        
+        String jsonResponse = restClient.post().uri("/showtimes")
+        .body(newShowtime).retrieve().toEntity(String.class).getBody();
+        assertShowtimeJson(newShowtime, jsonResponse);
+    }
+
+    @Test
+    public void testCreateShowtimeOverlap() {
+        Showtime overlapShowtime = new Showtime(
+            matrix.getId(),
+            20.5,
+            showtime1.getTheater(),
+            showtime1.getStartTime(),
+            showtime1.getEndTime()
+        );
+
+        ResponseEntity<String> res = restClient.post().uri("/showtimes").body(overlapShowtime).retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
+        .toEntity(String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
+        String errorMessage = res.getBody();
+        assertNotNull(errorMessage);
+        assertEquals("Overlapping showtime.", errorMessage);
     }
 
     @Test
@@ -282,10 +327,61 @@ public class PopcornPalaceIntegrationTest {
     }
 
     @Test
+    public void testUpdateShowtimeNotExist() {
+        ResponseEntity<String> res = restClient.post().uri("/showtimes/update/{showtimeId}", 99999L).body(showtime1).retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
+        .toEntity(String.class);
+        assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+        String errorMessage = res.getBody();
+        assertNotNull(errorMessage);
+        assertEquals("Showtime with id '99999' not found.", errorMessage);
+    }
+
+    @Test
+    public void testUpdateShowtimeSelfOverlap() {
+        Showtime selfOverlapShowtime = new Showtime(
+            darkKnight.getId(),
+            50.70,
+            showtime3.getTheater(),
+            showtime3.getStartTime(),
+            showtime3.getEndTime()
+        );
+        ResponseEntity<Void> response = restClient.post().uri("/showtimes/update/{showtimeId}", showtime3.getId()).body(selfOverlapShowtime).retrieve().toBodilessEntity();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(darkKnight.getId(), showtimeRepository.findById(showtime3.getId()).get().getMovieId());
+    }
+
+    @Test
+    public void testUpdateShowtimeNoMovie() {
+        Showtime noMovieShowtime = new Showtime(
+            55555L,
+            16.0,
+            "IMAX Theater",
+            LocalDateTime.parse("2025-03-10T15:30"),
+            LocalDateTime.parse("2025-03-10T18:30")
+        );
+        ResponseEntity<String> res = restClient.post().uri("/showtimes/update/{showtimeId}", showtime1.getId()).body(noMovieShowtime).retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
+        .toEntity(String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
+        String errorMessage = res.getBody();
+        assertNotNull(errorMessage);
+        assertEquals("Movie with id '55555' does not exist.", errorMessage);
+    }
+
+    @Test
     public void testDeleteShowtimeSuccess() {
         ResponseEntity<Void> response = restClient.delete().uri("/showtimes/{showtimeId}", showtime2.getId()).retrieve().toBodilessEntity();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertFalse(showtimeRepository.existsById(showtime2.getId()));
+    }
+
+    @Test
+    public void testDeleteShowtimeNotExist() {
+        ResponseEntity<String> res = restClient.delete().uri("/showtimes/{showtimeId}", 99999L).retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
+        .toEntity(String.class);
+        assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
     }
 
     /****************************** Booking API ******************************/

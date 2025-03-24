@@ -68,10 +68,12 @@ public class MovieController {
             return notFoundResponse;
         }
 
-        // Check if a movie with the same new title already exists
-        ResponseEntity<?> existsResponse = checkIfMovieExists(newMovie.getTitle());
-        if (existsResponse != null) {
-            return existsResponse;
+        if (!newMovie.getTitle().equals(movieTitle)) {
+            // Check if a movie with the same new title already exists
+            ResponseEntity<?> existsResponse = checkIfMovieExists(newMovie.getTitle());
+            if (existsResponse != null) {
+                return existsResponse;
+            }
         }
 
         // update the movie
