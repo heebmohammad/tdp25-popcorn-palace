@@ -28,7 +28,7 @@ public class ShowtimeController {
 
     private ResponseEntity<?> checkIfShowtimeOverlap(Showtime showtime) {
         if (showtimeRepository.isOverlappingShowtime(
-            showtime.getTheater(), showtime.getStartTime(), showtime.getEndTime())) {
+            showtime.getId(), showtime.getTheater(), showtime.getStartTime(), showtime.getEndTime())) {
                 return ResponseEntity.badRequest().body("Overlapping showtime.");
         }
         return null; // No error found
@@ -90,6 +90,7 @@ public class ShowtimeController {
         if (notFoundResponse != null) {
             return notFoundResponse;
         }
+        showtime.setId(showtimeId);
 
         ResponseEntity<?> movieExistResponse = checkIfMovieExist(showtime.getMovieId());
         if (movieExistResponse != null) {
@@ -102,14 +103,7 @@ public class ShowtimeController {
         }
 
         // update the showtime
-        showtimeRepository.updateShowtime(
-            showtimeId,
-            showtime.getMovieId(),
-            showtime.getPrice(),
-            showtime.getTheater(),
-            showtime.getStartTime(),
-            showtime.getEndTime()
-        );
+        showtimeRepository.save(showtime);
 
         // Return a 200 Ok response
         return ResponseEntity.ok(null);

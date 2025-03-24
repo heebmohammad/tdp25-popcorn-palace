@@ -57,7 +57,7 @@ public class ShowtimeControllerTest {
         Showtime newShowtime = new Showtime(1L, 10.5, "Theater1", LocalDateTime.of(2025, 3, 24, 10, 0), LocalDateTime.of(2025, 3, 24, 12, 0));
         
         when(movieRepository.existsById(1L)).thenReturn(true);
-        when(showtimeRepository.isOverlappingShowtime("Theater1", newShowtime.getStartTime(), newShowtime.getEndTime())).thenReturn(false);
+        when(showtimeRepository.isOverlappingShowtime(1L, "Theater1", newShowtime.getStartTime(), newShowtime.getEndTime())).thenReturn(false);
         when(showtimeRepository.save(any(Showtime.class))).thenReturn(newShowtime);
 
         mockMvc.perform(post("/showtimes")
@@ -85,7 +85,7 @@ public class ShowtimeControllerTest {
         Showtime newShowtime = new Showtime(1L, 10.5, "Theater1", LocalDateTime.of(2025, 3, 24, 10, 0), LocalDateTime.of(2025, 3, 24, 12, 0));
 
         when(movieRepository.existsById(1L)).thenReturn(true);
-        when(showtimeRepository.isOverlappingShowtime("Theater1", newShowtime.getStartTime(), newShowtime.getEndTime())).thenReturn(true);
+        when(showtimeRepository.isOverlappingShowtime(null, "Theater1", newShowtime.getStartTime(), newShowtime.getEndTime())).thenReturn(true);
 
         mockMvc.perform(post("/showtimes")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -102,7 +102,7 @@ public class ShowtimeControllerTest {
 
         when(showtimeRepository.existsById(showtimeId)).thenReturn(true);
         when(movieRepository.existsById(1L)).thenReturn(true);
-        when(showtimeRepository.isOverlappingShowtime("Theater1", updatedShowtime.getStartTime(), updatedShowtime.getEndTime())).thenReturn(false);
+        when(showtimeRepository.isOverlappingShowtime(1L, "Theater1", updatedShowtime.getStartTime(), updatedShowtime.getEndTime())).thenReturn(false);
 
         mockMvc.perform(post("/showtimes/update/{showtimeId}", showtimeId)
                 .contentType(MediaType.APPLICATION_JSON)
