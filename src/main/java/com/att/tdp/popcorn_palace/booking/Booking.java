@@ -34,6 +34,13 @@ public class Booking {
         // Default constructor
     }
 
+    // Constructor with parameters
+    public Booking(Long showtimeId, Integer seatNumber, UUID userId) {
+        setShowtimeId(showtimeId);
+        setSeatNumber(seatNumber);
+        setUserId(userId);
+    }
+
     // Getters and Setters
     
     public UUID getBookingId() {
