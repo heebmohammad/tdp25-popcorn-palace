@@ -21,11 +21,16 @@ import com.att.tdp.popcorn_palace.movie.Movie;
 import com.att.tdp.popcorn_palace.movie.MovieRepository;
 import com.att.tdp.popcorn_palace.showtime.Showtime;
 import com.att.tdp.popcorn_palace.showtime.ShowtimeRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -125,14 +130,26 @@ public class PopcornPalaceIntegrationTest {
 
     @Test
     public void testGetAllMoviesDetails() {
-        List<Movie> movies = restClient.get().uri("/movies/all").retrieve().body(new ParameterizedTypeReference<>() {});
-        
-        // Assert that the movie details are correct
-        assertEquals("The Shawshank Redemption", movies.getFirst().getTitle());
-        assertEquals("DRAMA", movies.getFirst().getGenre().toString());
-        assertEquals(142, movies.getFirst().getDuration());
-        assertEquals(9.3, movies.getFirst().getRating(), 0.1);
-        assertEquals(1994, movies.getFirst().getReleaseYear());
+        String jsonResponse = restClient.get().uri("/movies/all").retrieve().body(String.class);
+        assertNotNull(jsonResponse);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+            assertTrue(jsonNode.isArray());
+            JsonNode firstMovie = jsonNode.get(0);
+            assertTrue(firstMovie.has("id"));
+            Long id = firstMovie.get("id").asLong();
+            Movie movie = objectMapper.readValue(firstMovie.toString(), Movie.class);
+
+            assertEquals(shawshank.getId(), id);
+            assertEquals(shawshank.getTitle(), movie.getTitle());
+            assertEquals(shawshank.getGenre(), movie.getGenre());
+            assertEquals(shawshank.getDuration(), movie.getDuration());
+            assertEquals(shawshank.getRating(), movie.getRating(), 0.1);
+            assertEquals(shawshank.getReleaseYear(), movie.getReleaseYear());
+        } catch (JsonProcessingException e) {
+            fail("Failed to process JSON: " + e.getMessage());
+        }
     }
 
     @Test
@@ -171,11 +188,26 @@ public class PopcornPalaceIntegrationTest {
 
     /****************************** Showtime API ******************************/
 
-/*    @Test
+    @Test
     public void testGetShowtimeByIdSuccess() {
-        ResponseEntity<Showtime> response = restClient.get("/showtimes/" + showtime1.getId(), Showtime.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(showtime1.getId(), response.getBody().getId());
+        String jsonResponse = restClient.get().uri("/showtimes/{showtimeId}", showtime1.getId()).retrieve().body(String.class);
+        assertNotNull(jsonResponse);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        try {
+            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+            assertTrue(jsonNode.has("id"));
+            Long id = jsonNode.get("id").asLong();
+            Showtime showtime = objectMapper.readValue(jsonNode.toString(), Showtime.class);
+            
+            assertEquals(showtime1.getId(), id);
+            assertEquals(showtime1.getPrice(), showtime.getPrice(), 0.1);
+            assertEquals(showtime1.getTheater(), showtime.getTheater());
+            assertEquals(showtime1.getStartTime(), showtime.getStartTime());
+            assertEquals(showtime1.getEndTime(), showtime.getEndTime());
+        } catch (JsonProcessingException e) {
+            fail("Failed to process JSON: " + e.getMessage());
+        }
     }
 
     @Test
@@ -187,19 +219,27 @@ public class PopcornPalaceIntegrationTest {
             LocalDateTime.parse("2025-03-10T15:30"),
             LocalDateTime.parse("2025-03-10T18:30")
         );
-        ResponseEntity<Showtime> response = restClient.post("/showtimes", newShowtime, Showtime.class);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(showtimeRepository.findById(newShowtime.getId()));
+        ResponseEntity<Showtime> response = restClient.post().uri("/showtimes").body(newShowtime).retrieve().toEntity(Showtime.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertNotNull(response.getBody().getTheater());
+    }
+
+    @Test
+    public void testUpdateShowtimeSuccess() {
+        showtime1.setTheater("newTheater");
+        ResponseEntity<Void> response = restClient.post().uri("/showtimes/update/{showtimeId}", showtime1.getId()).body(showtime1).retrieve().toBodilessEntity();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("newTheater", showtimeRepository.findById(showtime1.getId()).get().getTheater());
     }
 
     @Test
     public void testDeleteShowtimeSuccess() {
-        ResponseEntity<Void> response = restClient.delete("/showtimes/" + showtime2.getId());
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        ResponseEntity<Void> response = restClient.delete().uri("/showtimes/{showtimeId}", showtime2.getId()).retrieve().toBodilessEntity();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertFalse(showtimeRepository.existsById(showtime2.getId()));
     }
 
-*/
     /****************************** Booking API ******************************/
 /*
     @Test
@@ -210,12 +250,5 @@ public class PopcornPalaceIntegrationTest {
         assertNotNull(bookingRepository.findById(newBooking.getId()));
     }
 
-    @Test
-    public void testCreateBookingExceedsCapacity() {
-        Booking exceedCapacityBooking = new Booking(showtime1.getId(), 100, UUID.randomUUID());
-        ResponseEntity<String> response = restClient.post("/bookings", exceedCapacityBooking, String.class);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody().contains("Exceeds capacity"));
-    }
 */
 }
