@@ -1,7 +1,6 @@
 package com.att.tdp.popcorn_palace.showtime;
 
-import java.util.Date;
-
+import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -28,14 +27,23 @@ public class Showtime {
     private String theater;
 
     @Column(name = "start_time")
-    private Date startTime;
+    private LocalDateTime startTime;
 
     @Column(name = "end_time")
-    private Date endTime;
+    private LocalDateTime endTime;
 
     // No-argument constructor for JPA
     public Showtime() {
         // Default constructor
+    }
+
+    // Constructor with parameters
+    public Showtime(Long movieId, Double price, String theater, LocalDateTime startTime, LocalDateTime endTime) {
+        setMovieId(movieId);
+        setPrice(price);
+        setTheater(theater);
+        setStartTime(startTime);
+        setEndTime(endTime);
     }
 
     // Getters and Setters
@@ -91,11 +99,11 @@ public class Showtime {
         }
     }
     
-    public Date getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
     
-    public void setStartTime(Date startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         if (startTime == null) {
             throw new IllegalArgumentException("start time cannot be empty.");
         }
@@ -103,11 +111,11 @@ public class Showtime {
         this.validateTimes();
     }
     
-    public Date getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
     
-    public void setEndTime(Date endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         if (endTime == null) {
             throw new IllegalArgumentException("end time cannot be empty.");
         }

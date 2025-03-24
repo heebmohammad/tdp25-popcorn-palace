@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS Showtime (
     movie_id BIGINT NOT NULL,
     price DOUBLE PRECISION NOT NULL CHECK(price > 0),
     theater VARCHAR(255) NOT NULL,
-    start_time VARCHAR(64) NOT NULL,
-    end_time VARCHAR(64) NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL,
     CHECK (start_time < end_time),  -- Ensure start_time is before end_time
     FOREIGN KEY (movie_id) REFERENCES Movie(id) ON DELETE CASCADE  -- foreign key constraint
 );
