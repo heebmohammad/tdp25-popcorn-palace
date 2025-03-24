@@ -1,1 +1,2 @@
-[View Instructions](Instructions.md)
+# Instructions
+Content from [Instructions.md](Instructions.md).

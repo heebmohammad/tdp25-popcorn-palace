@@ -1,4 +1,4 @@
-
+/*
 DELETE FROM Movie;
 INSERT INTO Movie (title, genre, duration, rating, release_year)
 VALUES 
@@ -27,3 +27,4 @@ VALUES
     ((SELECT id FROM Showtime WHERE movie_id = (SELECT id FROM Movie WHERE title = 'The Dark Knight') LIMIT 1), 25, gen_random_uuid()),
     ((SELECT id FROM Showtime WHERE movie_id = (SELECT id FROM Movie WHERE title = 'Forrest Gump') LIMIT 1), 3, gen_random_uuid()),
     ((SELECT id FROM Showtime WHERE movie_id = (SELECT id FROM Movie WHERE title = 'The Matrix') LIMIT 1), 9, gen_random_uuid());
+*/
