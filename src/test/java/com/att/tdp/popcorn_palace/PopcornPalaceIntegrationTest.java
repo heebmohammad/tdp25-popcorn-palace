@@ -126,25 +126,36 @@ public class PopcornPalaceIntegrationTest {
         assertEquals(0, movies.size()); // Verify no movies
     }
 
+    private void assertMovieJson(Movie expected, JsonNode actual) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            assertTrue(actual.has("id"));
+            Long id = actual.get("id").asLong();
+            Movie movie = objectMapper.readValue(actual.toString(), Movie.class);
+
+            if (expected.getId() != null) {
+                assertEquals(expected.getId(), id);
+            }
+            assertEquals(expected.getTitle(), movie.getTitle());
+            assertEquals(expected.getGenre(), movie.getGenre());
+            assertEquals(expected.getDuration(), movie.getDuration());
+            assertEquals(expected.getRating(), movie.getRating(), 0.1);
+            assertEquals(expected.getReleaseYear(), movie.getReleaseYear());
+        } catch (JsonProcessingException e) {
+            fail("Failed to process JSON: " + e.getMessage());
+        }
+    }
+
     @Test
     public void testGetAllMoviesDetails() {
         String jsonResponse = restClient.get().uri("/movies/all").retrieve().body(String.class);
         assertNotNull(jsonResponse);
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(jsonResponse);
             assertTrue(jsonNode.isArray());
             JsonNode firstMovie = jsonNode.get(0);
-            assertTrue(firstMovie.has("id"));
-            Long id = firstMovie.get("id").asLong();
-            Movie movie = objectMapper.readValue(firstMovie.toString(), Movie.class);
-
-            assertEquals(shawshank.getId(), id);
-            assertEquals(shawshank.getTitle(), movie.getTitle());
-            assertEquals(shawshank.getGenre(), movie.getGenre());
-            assertEquals(shawshank.getDuration(), movie.getDuration());
-            assertEquals(shawshank.getRating(), movie.getRating(), 0.1);
-            assertEquals(shawshank.getReleaseYear(), movie.getReleaseYear());
+            assertMovieJson(shawshank, firstMovie);
         } catch (JsonProcessingException e) {
             fail("Failed to process JSON: " + e.getMessage());
         }
@@ -153,21 +164,27 @@ public class PopcornPalaceIntegrationTest {
     @Test
     public void testCreateMovieSuccess() {
         Movie newMovie = new Movie("Interstellar", "SCI-FI", 169, 8.6, 2014);
-        ResponseEntity<Movie> response = restClient.post().uri("/movies").body(newMovie).retrieve().toEntity(Movie.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(movieRepository.findByTitle("Interstellar"));
+        String jsonResponse = restClient.post().uri("/movies")
+        .body(newMovie).retrieve().toEntity(String.class).getBody();
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+            assertMovieJson(newMovie, jsonNode);
+        } catch (JsonProcessingException e) {
+            fail("Failed to process JSON: " + e.getMessage());
+        }
     }
 
     @Test
     public void testCreateMovieDuplicate() {
-        Movie duplicateMovie = new Movie("Inception", "SCI-FI", 148, 8.8, 2010);
+        Movie duplicateMovie = new Movie(inception.getTitle(), "SCI-FI", 148, 8.8, 2010);
         ResponseEntity<String> res = restClient.post().uri("/movies").body(duplicateMovie).retrieve()
         .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
         .toEntity(String.class);
         assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
         String errorMessage = res.getBody();
         assertNotNull(errorMessage);
-        assertTrue(errorMessage.equals("A movie with the title 'Inception' already exists."));
+        assertEquals("A movie with the title 'Inception' already exists.", errorMessage);
     }
 
     @Test
@@ -177,6 +194,38 @@ public class PopcornPalaceIntegrationTest {
         ResponseEntity<Void> response = restClient.post().uri("/movies/update/{movieTitle}", oldTitle).body(shawshank).retrieve().toBodilessEntity();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("The Shawshank Redemption 2", movieRepository.findById(shawshank.getId()).get().getTitle());
+    }
+
+    @Test
+    public void testUpdateMovieSameTitle() {
+        String oldTitle = shawshank.getTitle();
+        shawshank.setReleaseYear(2010);
+        ResponseEntity<Void> response = restClient.post().uri("/movies/update/{movieTitle}", oldTitle).body(shawshank).retrieve().toBodilessEntity();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(2010, movieRepository.findById(shawshank.getId()).get().getReleaseYear());
+    }
+
+    @Test
+    public void testUpdateMovieNotExist() {
+        ResponseEntity<String> res = restClient.post().uri("/movies/update/{movieTitle}", "NoMovie").body(shawshank).retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
+        .toEntity(String.class);
+        assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+        String errorMessage = res.getBody();
+        assertNotNull(errorMessage);
+        assertEquals("Movie with title 'NoMovie' not found.", errorMessage);
+    }
+
+    @Test
+    public void testUpdateMovieDuplicate() {
+        Movie duplicateMovie = new Movie(inception.getTitle(), "SCI-FI", 148, 8.8, 2010);
+        ResponseEntity<String> res = restClient.post().uri("/movies/update/{movieTitle}", shawshank.getTitle()).body(duplicateMovie).retrieve()
+        .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {})
+        .toEntity(String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
+        String errorMessage = res.getBody();
+        assertNotNull(errorMessage);
+        assertEquals("A movie with the title 'Inception' already exists.", errorMessage);
     }
 
     @Test
@@ -267,7 +316,7 @@ public class PopcornPalaceIntegrationTest {
         assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
         String errorMessage = res.getBody();
         assertNotNull(errorMessage);
-        assertTrue(errorMessage.equals("Showtime with id '99999' does not exist."));
+        assertEquals("Showtime with id '99999' does not exist.", errorMessage);
     }
 
     @Test
@@ -279,7 +328,7 @@ public class PopcornPalaceIntegrationTest {
         assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
         String errorMessage = res.getBody();
         assertNotNull(errorMessage);
-        assertTrue(errorMessage.equals("Seat Already Booked."));
+        assertEquals("Seat Already Booked.", errorMessage);
     }
 
 }
