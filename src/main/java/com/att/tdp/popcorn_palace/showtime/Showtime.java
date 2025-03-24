@@ -19,7 +19,7 @@ public class Showtime {
     private Long id;
 
     @Column(name = "price")
-    private Float price;
+    private Double price;
 
     @Column(name = "movie_id")
     private Long movieId;
@@ -70,11 +70,11 @@ public class Showtime {
         this.theater = theater;
     }
     
-    public Float getPrice() {
+    public Double getPrice() {
         return price;
     }
     
-    public void setPrice(Float price) {
+    public void setPrice(Double price) {
         if (price == null || price < 0) {
             throw new IllegalArgumentException("Price must be be a positive number.");
         }

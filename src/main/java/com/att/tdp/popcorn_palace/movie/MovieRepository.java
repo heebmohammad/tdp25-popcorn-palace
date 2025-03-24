@@ -22,5 +22,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Modifying
     @Transactional
     @Query("UPDATE Movie m SET m.title = :newTitle, m.genre = :newGenre, m.duration = :newDuration, m.rating = :newRating, m.releaseYear = :newReleaseYear WHERE m.title = :oldTitle")
-    void updateMovieByTitle(String oldTitle, String newTitle, Genre newGenre, Integer newDuration, Float newRating, Integer newReleaseYear);
+    void updateMovieByTitle(String oldTitle, String newTitle, Genre newGenre, Integer newDuration, Double newRating, Integer newReleaseYear);
 }

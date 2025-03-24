@@ -29,7 +29,7 @@ public class Movie {
     private Integer duration;
 
     @Column(name = "rating")
-    private Float rating;
+    private Double rating;
 
     @Column(name = "release_year")
     private Integer releaseYear;
@@ -37,6 +37,15 @@ public class Movie {
     // No-argument constructor for JPA
     public Movie() {
         // Default constructor
+    }
+
+    // Constructor with parameters
+    public Movie(String title, String genre, Integer duration, Double rating, Integer releaseYear) {
+        setTitle(title);
+        setGenre(genre);
+        setDuration(duration);
+        setRating(rating);
+        setReleaseYear(releaseYear);
     }
 
     // Getters and Setters
@@ -82,11 +91,11 @@ public class Movie {
         this.duration = duration;
     }
 
-    public Float getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(Float rating) {
+    public void setRating(Double rating) {
         if (rating == null || rating < 0 || rating > 10) {
             throw new IllegalArgumentException("Movie rating must be between 0 and 10.");
         }
