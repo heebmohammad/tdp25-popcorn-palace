@@ -51,7 +51,7 @@ public class BookingController {
 
         Booking savedBooking = bookingRepository.save(booking);
 
-        // Return a 200 Ok response with the saved movie
-        return ResponseEntity.ok(savedBooking);
+        // Return a 200 Ok response with the bookingId
+        return ResponseEntity.ok(new BookingResponseDTO(savedBooking.getBookingId()));
     }
 }

@@ -79,7 +79,7 @@ public class ShowtimeController {
 
         Showtime savedShowtime = showtimeRepository.save(showtime);
 
-        // Return a 200 Ok response with the saved movie
+        // Return a 200 Ok response with the saved showtime
         return ResponseEntity.ok(savedShowtime);
     }
 

@@ -14,20 +14,18 @@ import jakarta.persistence.Id;
 public class Booking {
     public static final Integer MAX_SEATS = 9999;
 
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "booking_id")
     private UUID bookingId;
 
-    @JsonIgnore
     @Column(name = "showtime_id")
     private Long showtimeId;
 
-    @JsonIgnore
     @Column(name = "seat_number")
     private Integer seatNumber;
 
-    @JsonIgnore
     @Column(name = "user_id")
     private UUID userId;
 
